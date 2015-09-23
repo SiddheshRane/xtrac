@@ -1,0 +1,5 @@
+1st byte in file is version number.the rest of the specification depends on this number
+FOR VERSION 1
+----------------------------------------------
+The second byte onwards starts the dictionary. The escape opcode is 0. This opcode cannot be used for keys. A key value entry starts with the byte value of the key followed by the value byte sequence and terminated with escape opcode(0). The next key-value entry starts the same way.
+The dictionary definition ends with double escape opcode sequence (00). 
