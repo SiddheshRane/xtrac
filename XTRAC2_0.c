@@ -1,11 +1,3 @@
-/* Status:Porting
-* Get rid of glass : COMPLETE
-* Convert new to malloc : COMPLETE
-* Indentation and formatting : COMPLETE
-* Convert ifstream to FILE* : PARTIAL
-*/
-//January 5 , 2014 :stable
-
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
