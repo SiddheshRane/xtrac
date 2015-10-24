@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "TrieSquare.h"
 
 typedef struct Trie {
     unsigned count[256];

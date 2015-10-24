@@ -2,16 +2,10 @@
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>
-#define OP 0
+#include "xtrac.h"
+
 ////////////////////////TOKEN RELATED///////////////////
 
-typedef struct Token {
-    char * token;
-    int size; //length of token obtained using strlen + 1
-    int gain; //compressional gain (=(size-2)*count - (size+1))
-    char code; //the keycode for compression(0 means unassigned)
-    struct Token * next; //for linked list
-} Token;
 //Standard Pointers to Tokens
 Token *START = NULL, *END = NULL;
 //the no. of tokens
@@ -31,16 +25,7 @@ FILE *ifile = NULL;
 FILE *ofile = NULL;
 
 //important
-int append(char*);
-void appendToken(Token*, Token*);
-int del(Token *);
-void traverse();
-void console();
-void fileParse();
-void strset(char*, char);
-void parseTest(FILE*);
-void Xtrac();
-void profile();
+
 
 /*
 Analyses a string to see if it matches

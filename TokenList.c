@@ -1,4 +1,8 @@
 
+#include "xtrac.h"
+
 typedef struct TokenList {
-    Token *head, *tail;
+    Token *head;
+    Token *tail;
+    int tokenCount;
 } TokenList;
