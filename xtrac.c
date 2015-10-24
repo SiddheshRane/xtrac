@@ -61,7 +61,7 @@ int append(char * word) {
         if (match == 0) {
             ptr->gain += ptr->size - 2;
             return 0;
-        }            //check where to append
+        }//check where to append
         else if (match < 0) {
             break; //tokens ahead wont match so stop
         }
@@ -168,7 +168,8 @@ void printError(char *msg) {
 }
 //-----------MAIN--------------
 
-int main(int argc, char **argv) {
+int xtrac_main(int argc, char **argv) {
+    printf("Hope it reaches her\n");
     if (argc < 2) {
         printHelp();
         return 1;
@@ -192,9 +193,13 @@ int main(int argc, char **argv) {
     //init charmap
     int i = 0;
     for (; i < 256; i++)charmap[i] = 0;
+    printf("Parsing..\n");
     parseTest(ifile);
+    printf("Charmap...\n");
     xmlCharmap();
+    printf("traversing...\n");
     traverse();
+    printf("Xtrac...\n");
     Xtrac();
     fclose(ifile);
     fclose(ofile);
@@ -267,7 +272,7 @@ void Xtrac() {
     if (!ofile) {
         exit(0);
     }
-
+    printf("profiling...\n");
     profile();
     fputc(OP, ofile); //begin metadata
     //metadata
@@ -285,9 +290,10 @@ void Xtrac() {
     }//end meta data
     //substitution
     {
+        fseek(ifile, 0, 0);
         char buf[40], ch;
         strset(buf, '\0');
-        while (ch = fgetc(ifile)) {
+        while ((ch = fgetc(ifile)) != EOF) {
             if (!isalnum(ch))
                 fputc(ch, ofile);
             else {
@@ -323,6 +329,7 @@ void Xtrac() {
 }//Xtrac OVER
 
 void profile() {
+    printf("THIS GAS BEEN MOFIDUFED");
     Token *sentinel = malloc(sizeof (Token));
     if (sentinel) {
         sentinel->token = malloc(1);
