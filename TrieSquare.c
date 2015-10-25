@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "TrieSquare.h"
+#include "TokenSet.h"
 
 typedef struct Trie {
     unsigned count[256];
@@ -13,7 +14,14 @@ typedef struct TrieSquare {
     int count[256];
 } TrieSquare;
 
-TrieSquare trisqr = {
+typedef struct Key {
+    unsigned char i, j;
+    struct Key *next;
+} Key;
+
+Key *keys = NULL;
+
+static TrieSquare trisqr = {
     {NULL},
     {0}
 };
@@ -43,7 +51,8 @@ void printChar(int ch) {
 }
 
 void printTrieSquare() {
-    int i;
+    int i, j = 0;
+    unsigned char unused[256] = {0};
     for (i = 0; i < 256; i++) {
         Trie* trie = trisqr.ascii[i];
         if (trie) {
@@ -52,7 +61,7 @@ void printTrieSquare() {
             printf(") -> ");
             int j;
             for (j = 0; j < 256; j++) {
-                if (trie->count[j] > 1) {
+                if (trie->count[j] > 0) {
                     printf("(%d|", trie->count[j]);
                     printChar(j);
                     printf(") ");
@@ -60,9 +69,29 @@ void printTrieSquare() {
             }
             printf("\n");
         }
-
+        else {
+            unused[j++] = i;
+        }
     }
+    printf("Unused Characters(%d)\n[", j);
+    for(i = 0; i < j ; i++) {
+        printChar((unsigned )unused[i]);
+        printf("|");
+    }
+    printf("]");
+}
 
+void findMostRepeatingKeywords() {
+    int i, max = 0;
+    for (i = 0; i < 256; i++) {
+        if (!trisqr.count[i]) {
+            continue;
+        }
+        if (trisqr.count[i] > max) {
+            return;
+        }
+    }
+    
 }
 
 void parseIntoTrySquare(FILE *input) {

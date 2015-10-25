@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/TokenList.o \
+	${OBJECTDIR}/TokenSet.o \
 	${OBJECTDIR}/TrieSquare.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/xtrac.o
@@ -65,10 +65,10 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/xtrac: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/xtrac ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/TokenList.o: TokenList.c 
+${OBJECTDIR}/TokenSet.o: TokenSet.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TokenList.o TokenList.c
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TokenSet.o TokenSet.c
 
 ${OBJECTDIR}/TrieSquare.o: TrieSquare.c 
 	${MKDIR} -p ${OBJECTDIR}

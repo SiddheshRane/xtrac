@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
     void parseIntoTrySquare(FILE* input);
-
+    void printTrieSquare();
 
 #ifdef	__cplusplus
 }

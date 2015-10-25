@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>TokenSet.h</itemPath>
       <itemPath>TrieSquare.h</itemPath>
       <itemPath>xtrac.h</itemPath>
     </logicalFolder>
@@ -14,7 +15,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>TokenList.c</itemPath>
+      <itemPath>TokenSet.c</itemPath>
       <itemPath>TrieSquare.c</itemPath>
       <itemPath>main.c</itemPath>
       <itemPath>xtrac.c</itemPath>
@@ -66,7 +67,9 @@
       </item>
       <item path="SUMMARY.md" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="TokenList.c" ex="false" tool="0" flavor2="0">
+      <item path="TokenSet.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="TokenSet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="TrieSquare.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -78,6 +81,29 @@
       </item>
       <item path="data1.txt" ex="false" tool="3" flavor2="0">
       </item>
+      <folder path="TestFiles/f1">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f1</output>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f2">
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f2</output>
+          <linkerLibItems>
+            <linkerOptionItem>-lcunit</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
       <item path="main.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="xtr format specification.txt" ex="false" tool="3" flavor2="0">
@@ -115,7 +141,9 @@
       </item>
       <item path="SUMMARY.md" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="TokenList.c" ex="false" tool="0" flavor2="0">
+      <item path="TokenSet.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="TokenSet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="TrieSquare.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -127,6 +155,29 @@
       </item>
       <item path="data1.txt" ex="false" tool="3" flavor2="0">
       </item>
+      <folder path="TestFiles/f1">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f1</output>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f2">
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f2</output>
+          <linkerLibItems>
+            <linkerOptionItem>-lcunit</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
       <item path="main.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="xtr format specification.txt" ex="false" tool="3" flavor2="0">
