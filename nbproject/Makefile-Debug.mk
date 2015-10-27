@@ -35,7 +35,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/Huffman.o \
 	${OBJECTDIR}/TokenSet.o \
 	${OBJECTDIR}/TrieSquare.o \
 	${OBJECTDIR}/main.o \
@@ -56,40 +55,35 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lcunit
+LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${TESTDIR}/TestFiles/f2
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/xtrac
 
-${TESTDIR}/TestFiles/f2: ${OBJECTFILES}
-	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.c} -o ${TESTDIR}/TestFiles/f2 ${OBJECTFILES} ${LDLIBSOPTIONS}
-
-${OBJECTDIR}/Huffman.o: Huffman.c 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.c) -g -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Huffman.o Huffman.c
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/xtrac: ${OBJECTFILES}
+	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
+	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/xtrac ${OBJECTFILES} ${LDLIBSOPTIONS}
 
 ${OBJECTDIR}/TokenSet.o: TokenSet.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TokenSet.o TokenSet.c
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TokenSet.o TokenSet.c
 
 ${OBJECTDIR}/TrieSquare.o: TrieSquare.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TrieSquare.o TrieSquare.c
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TrieSquare.o TrieSquare.c
 
 ${OBJECTDIR}/main.o: main.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
 
 ${OBJECTDIR}/xtrac.o: xtrac.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/xtrac.o xtrac.c
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/xtrac.o xtrac.c
 
 # Subprojects
 .build-subprojects:
@@ -97,7 +91,7 @@ ${OBJECTDIR}/xtrac.o: xtrac.c
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${TESTDIR}/TestFiles/f2
+	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/xtrac
 
 # Subprojects
 .clean-subprojects:
