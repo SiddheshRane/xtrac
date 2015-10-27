@@ -8,9 +8,13 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/siddhesh/NetBeansProjects/xtrac/TrieSquare.h</file>
+            <file>file:/home/siddhesh/NetBeansProjects/xtrac/TokenSet.h</file>
             <file>file:/home/siddhesh/NetBeansProjects/xtrac/xtrac.c</file>
             <file>file:/home/siddhesh/NetBeansProjects/xtrac/TrieSquare.c</file>
             <file>file:/home/siddhesh/NetBeansProjects/xtrac/xtrac.h</file>
+            <file>file:/home/siddhesh/NetBeansProjects/xtrac/main.c</file>
+            <file>file:/home/siddhesh/NetBeansProjects/xtrac/TokenSet.c</file>
+            <file>file:/home/siddhesh/NetBeansProjects/xtrac/Huffman.c</file>
         </group>
     </open-files>
 </project-private>
