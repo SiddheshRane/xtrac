@@ -19,7 +19,6 @@ typedef struct Key {
     struct Key *next;
 } Key;
 
-Key *keys = NULL;
 
 static TrieSquare trisqr = {
     {NULL},
@@ -68,19 +67,21 @@ void printTrieSquare() {
                 }
             }
             printf("\n");
-        }
-        else {
+        } else {
             unused[j++] = i;
         }
     }
     printf("Unused Characters(%d)\n[", j);
-    for(i = 0; i < j ; i++) {
-        printChar((unsigned )unused[i]);
+    for (i = 0; i < j; i++) {
+        printChar((unsigned) unused[i]);
         printf("|");
     }
     printf("]");
 }
 
+int getMaxLessThan(int upperLimit) {
+    
+}
 void findMostRepeatingKeywords() {
     int i, max = 0;
     for (i = 0; i < 256; i++) {
@@ -91,7 +92,7 @@ void findMostRepeatingKeywords() {
             return;
         }
     }
-    
+
 }
 
 void parseIntoTrySquare(FILE *input) {

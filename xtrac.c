@@ -26,7 +26,6 @@ FILE *ofile = NULL;
 
 //important
 
-
 /*
 Analyses a string to see if it matches
 any of the existing tokens. If a match is found
@@ -314,7 +313,6 @@ void Xtrac() {
 }//Xtrac OVER
 
 void profile() {
-    printf("THIS GAS BEEN MOFIDUFED");
     Token *sentinel = malloc(sizeof (Token));
     if (sentinel) {
         sentinel->token = malloc(1);
