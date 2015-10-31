@@ -10,7 +10,7 @@ typedef struct Prefix {
 } Prefix;
 
 int levelWiseCallback(Prefix*,int);
-void traverse(Prefix*, int (*compare)(Prefix*,int));
+static void traverse(Prefix*, int (*compare)(Prefix*,int));
 void flattenTree(Prefix*);
 void printTree(Prefix**, int);
 
@@ -59,6 +59,7 @@ HuffmanTree* buildHuffmanTree(int count[256]) {
     HuffmanTree *hf = calloc(1, sizeof(HuffmanTree));
     p1 = p1 == NULL ? p2 : p1;
     hf->root = p1;
+    flattenTree(hf->root);
     return hf;
 }
 
@@ -105,7 +106,7 @@ treelevel pop(treestack ts) {
 /* 
  * a generic function which traverses the tree in preorder.
  */
-void traverse(Prefix *t, int (*callback)(Prefix*, int)) {
+static void traverse(Prefix *t, int (*callback)(Prefix*, int)) {
 	if (!t)
 	{
 		return;

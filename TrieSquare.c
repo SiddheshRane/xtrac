@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "TrieSquare.h"
 #include "TokenSet.h"
+#include "Huffman.h"
 
 typedef struct Trie {
     unsigned count[256];
@@ -77,6 +78,8 @@ void printTrieSquare() {
         printf("|");
     }
     printf("]");
+    HuffmanTree *hf = buildHuffmanTree(trisqr.count);
+	
 }
 
 int getMaxLessThan(int upperLimit) {
@@ -120,6 +123,7 @@ int TrieSquare_main(int argc, char**argv) {
     }
     parseIntoTrySquare(ifile);
     printTrieSquare();
+    
     fclose(ifile);
     return 0;
 }
