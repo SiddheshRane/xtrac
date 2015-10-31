@@ -1,6 +1,8 @@
 #include  <stdlib.h>
 #include "list.h"
 
+list initList = {0, 0, 0 ,0};
+
 void* list_append(list* l, void *t) {
     if (!l || !t) {
         return NULL;
@@ -44,6 +46,35 @@ void* list_append(list* l, void *t) {
         }
     }
     return t;
+}
+
+void* list_delete(list *l, void* value) {
+	if (!l || !value) {
+        return NULL;
+    }
+	list_node* node = l->head;
+	while(node) {
+		if(node->value == value)
+			break;
+	node = node->next;
+	}
+	if(!node)
+		return NULL;
+	if(node->prev) {
+		node->prev->next = node->next;
+	}
+	else {
+		l->head = node->next;
+	}
+	if(node->next) {
+		node->next->prev = node->prev;
+	}
+	else {
+		l->tail = node->prev;
+	}
+	free(node);
+	l->count--;
+	return value;
 }
 
 int list_count(list* l) {
