@@ -13,6 +13,7 @@ typedef struct list {
 //if value is already present as determined by compare then the original value in the list is returned
 void* list_append(list* l, void *value);
 void* list_delete(list* l, void *value);
+void* list_delete_head(list* l);
 int list_count(list* l);
 void list_setComparator(list* l, int (*compare)(void* ,void*));
 

@@ -77,6 +77,12 @@ void* list_delete(list *l, void* value) {
 	return value;
 }
 
+void* list_delete_head(list* l) {
+	if(!l || !l->head)
+		return NULL;
+	return list_delete(l, l->head->value);
+}
+
 int list_count(list* l) {
 	if(!l)
 		return 0;
