@@ -258,6 +258,7 @@ void Xtrac() {
     }
     printf("profiling...\n");
     profile();
+    fputc(1, ofile);
     fputc(OP, ofile); //begin metadata
     //metadata
     {
