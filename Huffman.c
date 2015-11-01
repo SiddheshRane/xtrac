@@ -2,23 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Huffman.h"
 #include "list.h"
-
-typedef struct Prefix {
-    int freq;
-    char ascii;
-    struct Prefix *zero, *one;
-} Prefix;
-
-int levelWiseCallback(Prefix*, int);
-static void traverse(Prefix*, int (*compare)(Prefix*, int));
-void flattenTree(Prefix*);
-void printTree(Prefix**, int);
-
-typedef struct HuffmanTree {
-    Prefix *root;
-    int maxHeight;
-} HuffmanTree;
 
 Prefix* newPrefix() {
     Prefix *p = calloc(1, sizeof (Prefix));
@@ -76,201 +61,42 @@ HuffmanTree* buildHuffmanTree(int count[256]) {
         list_append(&l, newP);
     }
     HuffmanTree *hf = calloc(1, sizeof (HuffmanTree));
-    p1 = p1 == NULL ? p2 : p1;
     hf->root = p1;
-    flattenTree(hf->root);
+    printHuffmanTree(hf);
     return hf;
 }
 
+void print_binary(unsigned long l, unsigned digits) {
+    while(l || digits) {
+        if(l & 1)
+            printf("1");
+        else
+            printf("0");
+        l = l >> 1;
+        digits--;
+    }
+}
 
-
-/////////////STACK RELATED///////////////
-
-typedef struct treelevel {
-    Prefix *t;
-    int level;
-} treelevel;
-
-typedef struct stack {
-    struct treelevel stk[4096];
-    int top;
-} stack;
-typedef struct stack* treestack;
-
-void initstack(treestack *ts);
-void push(treestack ts, treelevel n);
-treelevel pop(treestack ts);
-
-void initstack(treestack *ts) {
-    *ts = malloc(sizeof (struct stack));
-    if (!*ts)
+void print_prefix_tree(Prefix* p, unsigned level) {
+    if (!p)
         return;
-    (*ts)->top = -1;
-}
-
-void push(treestack ts, treelevel tl) {
-    if (!tl.t)
-        return;
-    ts->top++;
-    ts->stk[ts->top] = tl;
-}
-const treelevel empty = {NULL, -1};
-
-treelevel pop(treestack ts) {
-    if (ts->top < 0) {
-        return empty;
+    if (!(p->one && p->zero)) {
+        printf("->%d|",p->freq);
+        printChar(p->ascii);
+        return ;
     }
-    treelevel ret = ts->stk[ts->top];
-    ts->top--;
-    return ret;
+    printf("\n%*c", level, '0');
+    print_prefix_tree(p->zero, level+1);
+    printf("\n%*c", level, '1');
+    print_prefix_tree(p->one, level+1);
+
 }
 
-/* 
- * a generic function which traverses the tree in preorder.
- */
-static void traverse(Prefix *t, int (*callback)(Prefix*, int)) {
-    if (!t) {
-        return;
-    }
-    treestack ts = NULL;
-    treelevel tl;
-    initstack(&ts);
-    int level = 0;
-    int rightLevelOffset = 0;
-    /* 1. If you have a left, go there. Repeat 1.
-     * 2. If you have a right, go there. Repeat from 1.
-     * 3. If you have a leaf node, go where the top of the stack points
-     */
-    do {
-
-        if (callback(t, level))
-            break;
-        if (t->zero) {
-            tl.t = t->one;
-            tl.level = level + 1;
-            push(ts, tl);
-            t = t->zero;
-            level++;
-        } else if (t->one) {
-            t = t->one;
-            level++;
-        }//leaf node. go where the stack top points
-        else {
-            tl = pop(ts);
-            t = tl.t;
-            level = tl.level;
-        }
-    } while (t);
+void printHuffmanTree(HuffmanTree* hf) {
+    Prefix *p = hf->root;
+    print_prefix_tree(p, 1);
 }
 
-/*
- * Level Wise Tree array Callback
- */
-Prefix valid = {0};
-Prefix* lineTree[8192];
-int lwtSize = 0;
-int maxLevel = 0;
-
-int levelWiseCallback(Prefix *t, int level) {
-    maxLevel = level > maxLevel ? level : maxLevel;
-    int index = (1 << level) - 1;
-    while (lineTree[index] != &valid)
-        index++;
-
-    lineTree[index] = t;
-    lwtSize++;
-
-    if (t->zero) {
-        lineTree[index * 2 + 1] = &valid;
-    }
-    if (t->one) {
-        lineTree[(index + 1)*2] = &valid;
-    }
-    return 0;
-}
-
-void flattenTree(Prefix* t) {
-    lwtSize = 0;
-    maxLevel = 0;
-    memset(lineTree, 0, sizeof (Prefix*)*8192);
-    lineTree[0] = &valid;
-    traverse(t, levelWiseCallback);
-    printTree(lineTree, maxLevel);
-    printf("maxLevel:%d", maxLevel);
-}
-
-/////////Tree Printing//////////
-
-void printNtimes(char c, int n) {
-    int i;
-    for (i = 0; i < n; i++) {
-        printf("%c", c);
-    }
-}
-
-void printSpace(int num) {
-    printNtimes(' ', num);
-}
-
-void printUnderScore(int num) {
-    printNtimes('_', num);
-}
-
-void printTree(Prefix **t, int level) {
-    if (!t || !*t)
-        return;
-    int i, j;
-    char ch;
-    int numSpaces;
-    for (i = level; i > -1; i -= 1) {
-        numSpaces = (1 << i);
-        numSpaces /= 2;
-        for (j = 0; j < 1 << (level - i); j++) {
-            ch = ' ';
-            printNtimes(' ', numSpaces);
-            if (*t && (*t)->zero)
-                ch = '_';
-            printNtimes(ch, numSpaces - 1);
-            if (*t) {
-                if ((*t)->ascii)
-                    printChar((*t)->ascii);
-                else
-                    printf("%d", (*t)->freq);
-            } else
-                printf(" ");
-            //printf("%c", ch);
-            if (*t && (*t)->one)
-                ch = '_';
-            else
-                ch = ' ';
-            printNtimes(ch, numSpaces - 1);
-            printNtimes(' ', numSpaces);
-            printf(" ");
-            t++;
-        }
-        printf("\n");
-        if (!i)
-            break;
-        t = t - j;
-        for (j = 0; j < 1 << (level - i); j++) {
-            printNtimes(' ', numSpaces - 1);
-            if (*t && (*t)->zero)
-                ch = '/';
-            else
-                ch = ' ';
-            printf("%c", ch);
-            printNtimes(' ', (numSpaces - 1)*2 + 1);
-            if (*t && (*t)->one)
-                ch = '\\';
-            else
-                ch = ' ';
-            printf("%c", ch);
-            printNtimes(' ', numSpaces);
-            t++;
-        }
-        printf("\n");
-    }
-}
 
 ///////Huffman Main/////////
 
