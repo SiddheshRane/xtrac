@@ -10,3 +10,4 @@ typedef struct HuffmanTree {
 } HuffmanTree;
 
 HuffmanTree* buildHuffmanTree(int count[256]);
+void printHuffmanTree(HuffmanTree*);
