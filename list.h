@@ -16,5 +16,6 @@ void* list_delete(list* l, void *value);
 void* list_delete_head(list* l);
 int list_count(list* l);
 void list_setComparator(list* l, int (*compare)(void* ,void*));
+list* newList();
 
 extern list initList;
