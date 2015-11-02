@@ -5,6 +5,7 @@
 #include "TrieSquare.h"
 #include "TokenSet.h"
 #include "Huffman.h"
+#include "list.h"
 
 typedef struct Trie {
     unsigned count[256];
@@ -16,8 +17,8 @@ typedef struct TrieSquare {
 } TrieSquare;
 
 typedef struct Key {
-    unsigned char i, j;
-    struct Key *next;
+    int i;
+    int j;
 } Key;
 
 
@@ -79,23 +80,66 @@ void printTrieSquare() {
     }
     printf("]");
     HuffmanTree *hf = buildHuffmanTree(trisqr.count);
-	
+
 }
 
-int getMaxLessThan(int upperLimit) {
-    
+static int compareTrie(void* v1, void* v2) {
+    if (!v1 || !v2) {
+        printf("compareTrie(NULL)\n");
+        return 0;
+    }
+    Key *k1 = (Key*) v1;
+    Key *k2 = (Key*) v2;
+
+    unsigned c1 = trisqr.ascii[k1->i]->count[k1->j];
+    unsigned c2 = trisqr.ascii[k2->i]->count[k2->j];
+
+    if (c1 == c2)
+        return 0;
+    if (c1 > c2) {
+        return 1;
+    }
+    return -1;
+
 }
-void findMostRepeatingKeywords() {
-    int i, max = 0;
+
+list* sortTrie() {
+    list *l = newList();
+    list_setComparator(l, compareTrie);
+    int i;
     for (i = 0; i < 256; i++) {
-        if (!trisqr.count[i]) {
+        if (!trisqr.ascii[i]) {
             continue;
         }
-        if (trisqr.count[i] > max) {
-            return;
+        int j;
+        for (j = 0; j < 256; j++) {
+            if (trisqr.ascii[i]->count[j] < 2U)
+                continue;
+            Key *k = calloc(1, sizeof (Key));
+            k->i = i;
+            k->j = j;
+            list_append(l, k);
         }
     }
+    return l;
+}
 
+void printSortedTrie(list* l) {
+    if (!l || list_count(l) < 1) {
+        printf("List empty");
+        return;
+    }
+    /*A temporary hack that directly accesses the linked list */
+    list_node* node = l->head;
+    while (node) {
+        Key *k = (Key*) node->value;
+        printf("%4u:", trisqr.ascii[k->i]->count[k->j]);
+        printChar(k->i);
+        printChar(k->j);
+        printf("\n");
+        node = node->next;
+    }
+    printf("%d number of abbreviations\n", l->count);
 }
 
 void parseIntoTrySquare(FILE *input) {
@@ -123,7 +167,10 @@ int TrieSquare_main(int argc, char**argv) {
     }
     parseIntoTrySquare(ifile);
     printTrieSquare();
-    
+    printf("\nsortingTrie\n");
+    list* sortedList = sortTrie();
+    printf("printing Sorted Trie\n");
+    printSortedTrie(sortedList);
     fclose(ifile);
     return 0;
 }
