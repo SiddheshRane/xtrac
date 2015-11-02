@@ -4,6 +4,10 @@
 
 list initList = {0, 0, 0, 0};
 
+list* newList() {
+    list *l = calloc(1, sizeof(list));
+    return l;
+}
 void* list_append(list* l, void *t) {
     if (!l || !t) {
         return NULL;
