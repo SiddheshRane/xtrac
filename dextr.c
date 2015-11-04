@@ -21,6 +21,7 @@ static int tokenCount = 0;
 static void append(Token*);
 */
 int dextr(FILE* input, FILE* output);
+void printMap();
 
 long filesize;
 

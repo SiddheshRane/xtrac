@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/Huffman.o \
 	${OBJECTDIR}/TokenSet.o \
 	${OBJECTDIR}/TrieSquare.o \
+	${OBJECTDIR}/dextr.o \
 	${OBJECTDIR}/list.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/xtrac.o
@@ -81,6 +82,11 @@ ${OBJECTDIR}/TrieSquare.o: TrieSquare.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TrieSquare.o TrieSquare.c
+
+${OBJECTDIR}/dextr.o: dextr.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dextr.o dextr.c
 
 ${OBJECTDIR}/list.o: list.c 
 	${MKDIR} -p ${OBJECTDIR}
