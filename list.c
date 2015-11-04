@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include "list.h"
 
-list initList = {0, 0, 0, 0};
+list initList = {0, 0, 0, 0, 0};
 
 list* newList() {
-    list *l = calloc(1, sizeof(list));
+    list *l = calloc(1, sizeof (list));
     return l;
 }
-void* list_append(list* l, void *t) {
+
+void* listAppend(list* l, void *t) {
     if (!l || !t) {
         return NULL;
     }
@@ -16,11 +17,10 @@ void* list_append(list* l, void *t) {
     if (l->compare) {
         list_node *node = l->head;
         while (node) {
-            /* if (l->compare(t, node->value) == 0)
-                 return node->value;
-             else */
             if (l->compare(t, node->value) < 0) {
                 break;
+            } else if (l->distinctElements && l->compare(t, node->value) == 0) {
+                return node->value;
             }
             insertAfter = node;
             node = node->next;
@@ -54,7 +54,7 @@ void* list_append(list* l, void *t) {
     return t;
 }
 
-void* list_delete(list *l, void* value) {
+void* listDelete(list *l, void* value) {
     if (!l || !value) {
         return NULL;
     }
@@ -81,25 +81,25 @@ void* list_delete(list *l, void* value) {
     return value;
 }
 
-void* list_delete_head(list* l) {
+void* listDeleteHead(list* l) {
     if (!l || !l->head)
         return NULL;
-    return list_delete(l, l->head->value);
+    return listDelete(l, l->head->value);
 }
 
-int list_count(list* l) {
+int listCount(list* l) {
     if (!l)
         return 0;
     return l->count;
 }
 
-void list_setComparator(list* l, int (*compare)(void*, void*)) {
+void listSetComparator(list* l, int (*compare)(void*, void*)) {
     if (!l)
         return;
     l->compare = compare;
 }
 
-void list_print(list *l, void (*print)(void*)) {
+void listPrint(list *l, void (*print)(void*)) {
     if (!l) {
         printf("Empty!\n");
         return;
@@ -110,4 +110,12 @@ void list_print(list *l, void (*print)(void*)) {
         print(node->value);
         node = node->next;
     }
+}
+
+void listSetDistinctElements(list l, int bool) {
+    if (!l) {
+        return;
+    }
+    l->distinctElements = bool;
+
 }
