@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include "list.h"
 
-list initList = {0, 0, 0, 0, 0};
+const list initList = {0, 0, 0, 0, 0};
+static list_node* implGetNodeFrom(list_node* from, void* value);
+static void* implDeleteNode(list* l, list_node* node);
 
 list* newList() {
     list *l = calloc(1, sizeof (list));
@@ -54,18 +56,20 @@ void* listAppend(list* l, void *t) {
     return t;
 }
 
-void* listDelete(list *l, void* value) {
-    if (!l || !value) {
-        return NULL;
-    }
-    list_node* node = l->head;
+static list_node* implGetNodeFrom(list_node* from, void* value) {
+    list_node* node = from;
     while (node) {
         if (node->value == value)
-            break;
+            return node;
         node = node->next;
     }
+    return NULL;
+}
+
+static void* implDeleteNode(list* l, list_node* node) {
     if (!node)
         return NULL;
+    void* value = node->value;
     if (node->prev) {
         node->prev->next = node->next;
     } else {
@@ -79,6 +83,14 @@ void* listDelete(list *l, void* value) {
     free(node);
     l->count--;
     return value;
+}
+
+void* listDelete(list *l, void* value) {
+    if (!l || !value) {
+        return NULL;
+    }
+    list_node* node = implGetNodeFrom(l->head, value);
+    return implDeleteNode(l, node);
 }
 
 void* listDeleteHead(list* l) {
@@ -112,10 +124,46 @@ void listPrint(list *l, void (*print)(void*)) {
     }
 }
 
-void listSetDistinctElements(list l, int bool) {
+void listSetDistinctElements(list* l, int bool) {
     if (!l) {
         return;
     }
     l->distinctElements = bool;
 
+}
+
+iterator* listGetIterator(list* l) {
+    if (!l) {
+        return NULL;
+    }
+    iterator *it = malloc(sizeof (iterator));
+    if (!it) {
+        return NULL;
+    }
+    it->current = l->head;
+    it->index = 0;
+    it->l = l;
+    it->remaining = l->count;
+    return it;
+}
+
+void* listGetNext(iterator* it) {
+    if (!it || !it->current) {
+        return NULL;
+    }
+    void* value = it->current->value;
+    it->current = it->current->next;
+    it->index++;
+    it->remaining--;
+    return value;
+}
+
+void* listDeleteNext(iterator* it) {
+    if (!it || !it->current) {
+        return NULL;
+    }
+    list_node* toDelete = it->current;
+    it->current = toDelete->next;
+    it->remaining--;
+    return implDeleteNode(it->l, it->current);
 }
