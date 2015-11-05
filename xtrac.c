@@ -5,21 +5,11 @@
 #include "xtrac.h"
 #include "list.h"
 #define VERSION 1
-////////////////////////TOKEN RELATED///////////////////
 
-//Standard Pointers to Tokens
-Token *START = NULL, *END = NULL;
-
-//the no. of tokens
-int tokenCount = 0;
 //character map
 int charmap[256];
 long numChars = 0; //total no. of characters read
 int numFree = 0; //no. of unused characters
-int MAX_GAIN = 0;
-//file pointer to last read position in input file
-long lastRead = 0;
-long ifs = 1; //input file size
 
 char *INPUTFILE;
 char *OUTPUTFILE;
@@ -27,9 +17,8 @@ FILE *ifile;
 FILE *ofile;
 
 static list tokenList;
-//important
 
-static int compareToken( void* t1,  void* t2) {
+static int compareToken(void* t1, void* t2) {
     Token *tt1 = t1;
     Token *tt2 = t2;
     if (!t1 && !t2)
@@ -90,34 +79,6 @@ int appendNewWord(char* word) {
     return 0;
 }
 
-/*This deletes the Token
-after prev and NOT prev
-
- */
-int del(Token* prev) {
-    Token *ptr;
-
-    if (!prev) { //delete START
-        ptr = START;
-        if (!START)
-            return 0;
-        START = START->next;
-        free(ptr->token);
-        free(ptr);
-        tokenCount--;
-        return 1;
-    }
-    ptr = prev->next;
-    if (ptr) {
-        prev->next = ptr->next;
-        free(ptr->token);
-        free(ptr);
-        tokenCount--;
-        return 1;
-    }
-    return 0; //no deletion occured
-}
-
 void xmlCharmap() {
     FILE* omap = fopen("charEXCEL.xml", "w");
     if (omap) {
@@ -127,10 +88,11 @@ void xmlCharmap() {
             if (charmap[j] == 0) numFree++; //increment unused char count
             fprintf(omap, "<tr><td>");
             fprintf(omap, "%c</td><td>%d</td><td>%d</td></tr>\n", j, j, charmap[j]);
-        }//end for
+        }
         fprintf(omap, "</table>");
         numFree--; //one opcode is reserved
-    }//end if
+        fclose(omap);
+    }
 }
 
 void strset(char *s, char c) {
@@ -144,9 +106,6 @@ void printHelp() {
     printf("Usage:\nxtrac <inputfile> <outputfile>");
 }
 
-void printError(char *msg) {
-    printf("%s", msg);
-}
 //-----------MAIN--------------
 
 int xtrac_main(int argc, char **argv) {
@@ -165,9 +124,6 @@ int xtrac_main(int argc, char **argv) {
         return 1;
     }
 
-    //init charmap
-    int i = 0;
-    for (; i < 256; i++)charmap[i] = 0;
     initGlobalTokenList();
     printf("Parsing..\n");
     parseFile(ifile);
@@ -227,22 +183,23 @@ void Xtrac() {
     printf("assignCodes...\n");
     assignCodes();
     fputc(VERSION, ofile);
-    fputc(OP, ofile); //begin metadata
-
-    iterator* it = listGetIterator(&tokenList);
-    Token *token;
-    while ((token = listGetNext(it))) {
-        fputc(token->code, ofile);
-        fprintf(ofile, "%s", token->token);
-        fputc(OP, ofile);
+    if (listCount(&tokenList)) {
+        /*Insert meta data if there is any*/
+        fputc(OP, ofile); //begin meta data
+        iterator* it = listGetIterator(&tokenList);
+        Token *token;
+        while ((token = listGetNext(it))) {
+            fputc(token->code, ofile);
+            fprintf(ofile, "%s", token->token);
+            fputc(OP, ofile);
+        }
+        free(it);
+        fputc(OP, ofile); //end meta data
     }
-    free(it);
-    fputc(OP, ofile);
-
     //substitution
-
     fseek(ifile, 0, 0);
-    char buf[40], ch;
+    char buf[40];
+    int ch;
     strset(buf, '\0');
     while ((ch = fgetc(ifile)) != EOF) {
         if (!isalnum(ch)) {
@@ -251,16 +208,16 @@ void Xtrac() {
         }
         int j = 1;
         buf[0] = ch;
-        while (buf[j] = fgetc(ifile)) {
-            if (isalnum(buf[j])) {
+        while (ch = fgetc(ifile)) {
+            if (isalnum(ch)) {
                 //Fill buf as long as you get alpha numeric
+                buf[j] = ch;
                 j++;
                 continue;
             }
             //search for match;
-            ch = buf[j]; //this value is not an alnum
             buf[j] = '\0';
-            it = listGetIterator(&tokenList);
+            iterator* it = listGetIterator(&tokenList);
             Token* token;
             while ((token = listGetNext(it))) {
                 if (strcmp(buf, token->token) == 0) {
@@ -272,7 +229,9 @@ void Xtrac() {
                 fprintf(ofile, "%s", buf);
                 strset(buf, '\0');
             }
-            fputc(ch, ofile);
+            if (ch != EOF) {
+                fputc(ch, ofile);
+            }
             break;
         }
     }
