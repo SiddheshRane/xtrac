@@ -5,21 +5,9 @@
 #define VERSION 1
 
 static char* map[256];
-/*
-static struct Token {
-    char* token;
-    char code; //the keycode for compression(0 means unassigned)
-    struct Token *next; //for linked list
 
-} *START = NULL, *END = NULL; */
-/*
-typedef struct Token Token;
- */
 static int tokenCount = 0;
 
-/*
-static void append(Token*);
-*/
 int dextr(FILE* input, FILE* output);
 void printMap();
 
@@ -31,6 +19,7 @@ static void load_map(FILE* input) {
     }
     if (fgetc(input)) {
         //if not zero, no map is defined in input file
+        fseek(input, -1, SEEK_CUR);
         return ;
     }
 
@@ -122,87 +111,3 @@ int dextr_main(int argc, char** argv) {
     fclose(input);
     fclose(output);
 }
-
-//returns >0 on error , 0 on normal termination
-/*
-int dextr() {
-    FILE* ifile = fopen(INPUTFILE, "r");
-
-
-    if (!ifile) {
-        perror("Could not open input file");
-        return 1;
-    }
-    FILE* ofile = fopen(OUTPUTFILE, "w");
-    if (!ofile) {
-        perror("Could not open output file");
-        return 2;
-    }
-
-    fseek(ifile, 0, 0);
-
-    //version check
-    char ch;
-    ch = fgetc(ifile);
-    if (ch != 1)return 3;
-
-    //metadata
-    ch = fgetc(ifile);
-    if (ch == OP);
-    char buf[128];
-    ch = fgetc(ifile);
-    size_t len;
-    while (!feof(ifile)) {
-
-        Token *tok = calloc(1, sizeof (Token));
-        tok->code = ch;
-
-        getdelim(&(tok->token), &len, 0, ifile);
-        tok->next = NULL;
-        append(tok);
-
-        ch = fgetc(ifile);
-        if (ch == OP)break;
-    }
-
-
-    while ((ch = fgetc(ifile)) != EOF) {
-
-        Token *ptr = START;
-        while (ptr) {
-            if (ptr->code == ch) {
-                if (!ptr->token) {
-                    printf("token empty\n");
-                    return 0;
-                }
-                fprintf(ofile, "%s", ptr->token);
-                ch = OP;
-                break;
-            }
-            ptr = ptr->next;
-        }
-
-        if (ch != OP)fputc(ch, ofile);
-    }
-
-    fclose(ifile);
-    fclose(ofile);
-    return 0;
-}
- *?
-/*
- append 'token' to end
- 
-static void append(Token *token) {
-    if (END) {
-        END->next = token;
-        END = token;
-
-    } else if (!START) { //nothing has been stored
-
-        START = END = token;
-    }
-    tokenCount++;
-}
- */
-
