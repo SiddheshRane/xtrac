@@ -29,7 +29,7 @@ void printPrefix(void* value) {
 HuffmanTree* buildHuffmanTree(int count[256]) {
     printf("buildingHuffmanTree\n");
     list l = initList;
-    list_setComparator(&l, comparePrefix);
+    listSetComparator(&l, comparePrefix);
     int i;
     for (i = 0; i < 256; i++) {
         if (count[i] == 0) {
@@ -42,13 +42,13 @@ HuffmanTree* buildHuffmanTree(int count[256]) {
         p->ascii = i;
         p->freq = count[i];
         printf("(freq:%d) ", p->freq);
-        list_append(&l, p);
+        listAppend(&l, p);
     }
 
-    list_print(&l, printPrefix);
+    listPrint(&l, printPrefix);
     printf("\n");
     Prefix *p1, *p2;
-    while ((p1 = list_delete_head(&l)) && (p2 = list_delete_head(&l))) {
+    while ((p1 = listDeleteHead(&l)) && (p2 = listDeleteHead(&l))) {
         Prefix *newP = newPrefix();
         newP->freq = p1->freq + p2->freq;
         if (p1->zero && p1->one) {
@@ -58,7 +58,7 @@ HuffmanTree* buildHuffmanTree(int count[256]) {
             newP->zero = p1;
             newP->one = p2;
         }
-        list_append(&l, newP);
+        listAppend(&l, newP);
     }
     HuffmanTree *hf = calloc(1, sizeof (HuffmanTree));
     hf->root = p1;

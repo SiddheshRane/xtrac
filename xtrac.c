@@ -3,122 +3,80 @@
 #include<string.h>
 #include<ctype.h>
 #include "xtrac.h"
+#include "list.h"
+#define VERSION 1
 
-////////////////////////TOKEN RELATED///////////////////
-
-//Standard Pointers to Tokens
-Token *START = NULL, *END = NULL;
-//the no. of tokens
-int tokenCount = 0;
 //character map
 int charmap[256];
 long numChars = 0; //total no. of characters read
 int numFree = 0; //no. of unused characters
-int MAX_GAIN = 0;
-//file pointer to last read position in input file
-long lastRead = 0;
-long ifs = 1; //input file size
 
-char *INPUTFILE = "taylor.txt";
-char *OUTPUTFILE = "output.xtr";
-FILE *ifile = NULL;
-FILE *ofile = NULL;
+char *INPUTFILE;
+char *OUTPUTFILE;
+FILE *ifile;
+FILE *ofile;
 
-//important
+static list tokenList;
 
-/*
-Analyses a string to see if it matches
-any of the existing tokens. If a match is found
-it increments the token's count else it creates
-a new token.
-Returns : 0 for successful termination
-          1 for unsuccessful termination due to
-          being out of memory.
+static int compareToken(void* t1, void* t2) {
+    Token *tt1 = t1;
+    Token *tt2 = t2;
+    if (!t1 && !t2)
+        return 0;
+    if (!t1)
+        return -1;
+    if (!t2) {
+        return 1;
+    }
+    return strcmp(tt1->token, tt2->token);
+}
 
- */
-int append(char * word) {
-    Token *ptr = START;
-    Token *last = NULL;
-    while (ptr) {
-        //increment count if token exists
-        int match = strcmp(word, ptr->token);
-        if (match == 0) {
-            ptr->gain += ptr->size - 2;
-            return 0;
-        }//check where to append
-        else if (match < 0) {
-            break; //tokens ahead wont match so stop
-        }
+static int compareGainInverted(void*t1, void* t2) {
+    Token *tt1 = t1;
+    Token *tt2 = t2;
+    int a = tt1->gain;
+    int b = tt2->gain;
+    if (a == b)
+        return 0;
+    if (a > b) {
+        return -1;
+    }
+    return 1;
+}
 
-        last = ptr;
-        ptr = ptr->next;
-    }//end of while
+static void initGlobalTokenList() {
+    tokenList = initList;
+    listSetComparator(&tokenList, compareToken);
+    listSetDistinctElements(&tokenList, 1);
+}
 
-    //append element if it does not exist
-    Token *temp = malloc(sizeof (Token));
-    if (!temp) return 1; //indicateOutOFMemory and exit
+int appendNewWord(char* word) {
     int len = strlen(word) + 1;
+    if (len < 3) {
+        //single letter words cannot be compressed
+        return 0;
+    }
+    Token* temp = malloc(sizeof (Token));
+    if (!temp) {
+        return 1; //indicateOutOFMemory and exit
+    }
+
     temp->token = malloc(len);
-    if (!temp->token) return 1;
+    if (!temp->token) {
+        return 1;
+    }
     strcpy(temp->token, word);
     temp->gain = -3; //when c=1 gain = c(s-2)-(s+1) = -3
     temp->size = len;
     temp->code = 0; //0 means unassigned
-    temp->next = NULL;
 
-    if (len <= 1) {
+    Token* appended = listAppend(&tokenList, temp);
+    if (appended != temp) {
+        appended->gain += appended->size - 2;
         free(temp->token);
         free(temp);
-    } else
-        appendToken(temp, last);
+    }
     return 0;
-}//end of append
-
-/*
-insert 'token' after 'after'
- */
-void appendToken(Token *token, Token *after) {
-    //cout<<"\nappending token..";
-    //warn("Warning" , "appending token");
-    if (after) {
-        Token *temp = after->next;
-        after->next = token;
-        token->next = temp;
-    } else if (!START) { //nothing has been stored
-        START = END = token;
-    } else { //append at first position
-        token->next = START;
-        START = token;
-    }
-    tokenCount++;
-}
-
-/*This deletes the Token
-after prev and NOT prev
-
- */
-int del(Token* prev) {
-    Token *ptr;
-
-    if (!prev) { //delete START
-        ptr = START;
-        if (!START)
-            return 0;
-        START = START->next;
-        free(ptr->token);
-        free(ptr);
-        tokenCount--;
-        return 1;
-    }
-    ptr = prev->next;
-    if (ptr) {
-        prev->next = ptr->next;
-        free(ptr->token);
-        free(ptr);
-        tokenCount--;
-        return 1;
-    }
-    return 0; //no deletion occured
 }
 
 void xmlCharmap() {
@@ -130,10 +88,11 @@ void xmlCharmap() {
             if (charmap[j] == 0) numFree++; //increment unused char count
             fprintf(omap, "<tr><td>");
             fprintf(omap, "%c</td><td>%d</td><td>%d</td></tr>\n", j, j, charmap[j]);
-        }//end for
+        }
         fprintf(omap, "</table>");
         numFree--; //one opcode is reserved
-    }//end if
+        fclose(omap);
+    }
 }
 
 void strset(char *s, char c) {
@@ -147,13 +106,9 @@ void printHelp() {
     printf("Usage:\nxtrac <inputfile> <outputfile>");
 }
 
-void printError(char *msg) {
-    printf("%s", msg);
-}
 //-----------MAIN--------------
 
 int xtrac_main(int argc, char **argv) {
-    printf("Hope it reaches her\n");
     if (argc < 2) {
         printHelp();
         return 1;
@@ -169,20 +124,13 @@ int xtrac_main(int argc, char **argv) {
         return 1;
     }
 
-    START = END = NULL;
-    tokenCount = 0;
-    MAX_GAIN = 0;
-    numFree = 0;
-
-    //init charmap
-    int i = 0;
-    for (; i < 256; i++)charmap[i] = 0;
+    initGlobalTokenList();
     printf("Parsing..\n");
-    parseTest(ifile);
+    parseFile(ifile);
+    printf("remove unnecessary tokens\n");
+    removeIncompressibleTokens();
     printf("Charmap...\n");
     xmlCharmap();
-    printf("traversing...\n");
-    traverse();
     printf("Xtrac...\n");
     Xtrac();
     fclose(ifile);
@@ -191,187 +139,132 @@ int xtrac_main(int argc, char **argv) {
 
 //-----------IMPORTANT------------
 
-void traverse() {
-    //working
-    Token *ptr = START, *last = NULL;
-    while (ptr) {
-        //memory clean up
-        int gain = ptr->gain;
-        if (gain < 1) {//no use of these tokens
-            del(last);
-            if (last) ptr = last->next;
-            else {
-                ptr = START;
-                last = NULL;
-            }
-        } else {
-            if (gain > MAX_GAIN)MAX_GAIN = gain;
-            last = ptr;
-            ptr = ptr->next;
+void removeIncompressibleTokens() {
+    iterator* it = listGetIterator(&tokenList);
+    Token* token;
+    while ((token = listGetNext(it))) {
+        if (token->gain < 1) {
+            listDelete(&tokenList, token);
         }
-    }//end while
+    }
+    free(it);
 }
 
-
-
-//FILE PARSE TEST
-
-void parseTest(FILE *stream) {
+void parseFile(FILE *stream) {
     if (!stream) return;
 
     char buffer[64];
     char ch;
     int i = 0; //index to check buffer overflow
     ch = fgetc(stream);
-    while (1) {
+    while ((ch = fgetc(stream)) != EOF) {
         buffer[i] = ch;
         charmap[ch]++; //update character map
         numChars++; //update no. of characters
         if (!isalnum(ch)) {
             buffer[i] = '\0';
             i = -1;
-            int appSTAT = append(buffer);
+            int appSTAT = appendNewWord(buffer);
             strset(buffer, '\0');
             if (appSTAT == 1)
                 return;
         }//end if
-        if ((ch = fgetc(stream)) == EOF)
-            break;
         i++;
     }//while
     buffer[i] = '\0';
-    append(buffer);
-}//parseTest
-//FILE PARSE TEST OVER
-
-
-//Xtrac
+    appendNewWord(buffer);
+}
 
 /*
 The most important method. It creates the compressed
 file
  */
 void Xtrac() {
-    if (!ifile)return;
-    if (!ofile) {
-        exit(0);
-    }
-    printf("profiling...\n");
-    profile();
-    fputc(1, ofile);
-    fputc(OP, ofile); //begin metadata
-    //metadata
-    {
-        Token *ptr = START;
-        while (ptr) {//there is a sentinel element we need to delete
-            if (ptr->gain == MAX_GAIN)del(ptr);
-            fputc(ptr->code, ofile);
-            fprintf(ofile, "%s", ptr->token);
+    printf("assignCodes...\n");
+    assignCodes();
+    fputc(VERSION, ofile);
+    if (listCount(&tokenList)) {
+        /*Insert meta data if there is any*/
+        fputc(OP, ofile); //begin meta data
+        iterator* it = listGetIterator(&tokenList);
+        Token *token;
+        while ((token = listGetNext(it))) {
+            fputc(token->code, ofile);
+            fprintf(ofile, "%s", token->token);
             fputc(OP, ofile);
-            ptr = ptr->next;
         }
-        //end metadata
-        fputc(OP, ofile);
-    }//end meta data
+        free(it);
+        fputc(OP, ofile); //end meta data
+    }
     //substitution
-    {
-        fseek(ifile, 0, 0);
-        char buf[40], ch;
-        strset(buf, '\0');
-        while ((ch = fgetc(ifile)) != EOF) {
-            if (!isalnum(ch))
-                fputc(ch, ofile);
-            else {
-                int j = 1;
-                buf[0] = ch;
-                while (buf[j] = fgetc(ifile)) {
-                    if (!isalnum(buf[j])) {//search for match;
-                        ch = buf[j];
-                        buf[j] = '\0';
-                        Token *ptr = START;
-                        while (ptr) {
-                            if (!strcmp(ptr->token, buf)) {
-                                fputc(ptr->code, ofile);
-                                j = -1;
-                                break;
-                            }
-                            ptr = ptr->next;
-                        }//end while
-                        if (j != -1) {
-                            fprintf(ofile, "%s", buf);
-                            strset(buf, '\0');
-                        }
-                        fputc(ch, ofile);
-                        break;
-                    }//end if
-                    j++;
-                }//end while
-            }//end else
+    fseek(ifile, 0, 0);
+    char buf[40];
+    int ch;
+    strset(buf, '\0');
+    while ((ch = fgetc(ifile)) != EOF) {
+        if (!isalnum(ch)) {
+            fputc(ch, ofile);
+            continue;
         }
-    }
-    Token *ptr = START;
-    while (del(ptr));
-}//Xtrac OVER
-
-void profile() {
-    Token *sentinel = malloc(sizeof (Token));
-    if (sentinel) {
-        sentinel->token = malloc(1);
-        *(sentinel->token) = '\0';
-        sentinel->size = 0;
-        sentinel->code = 0;
-        sentinel->next = START;
-        sentinel->gain = -1;
-        START = sentinel;
-    }
-
-
-    Token* ptr = START, *tokenmax = NULL; //tokenmax is token before largest token
-    Token *origSTART = START;
-
-    /*
-    out of numFree and tokenCount we choose whichever is smaller.
-    Otherwise there will be infinite loop if no. of tokens is less than
-    numFree
-     */
-    numFree = numFree < tokenCount ? numFree : tokenCount;
-    //find the largest token
-    int j;
-    for (j = 0; j < numFree; j++) {
-        int max = ptr->gain;
-        while (ptr->next) {
-            if (ptr->next->gain > max) {
-                max = ptr->next->gain;
-                tokenmax = ptr;
+        int j = 1;
+        buf[0] = ch;
+        while (ch = fgetc(ifile)) {
+            if (isalnum(ch)) {
+                //Fill buf as long as you get alpha numeric
+                buf[j] = ch;
+                j++;
+                continue;
             }
-            ptr = ptr->next;
-        }
-        //make the largest token the first token
-        if (tokenmax) {
-            //if tokenmax is not null
-            Token *temp = tokenmax->next;
-            tokenmax->next = temp->next;
-            temp->next = START;
-            START = temp;
-            ptr = origSTART;
-            tokenmax = NULL;
-        }
-    }
-    //now assign codes
-    ptr = START;
-    int i;
-    for (i = 1; i < 256; i++) {
-        if (charmap[i] == 0) {
-            if (!ptr)break;
-            ptr->code = i;
-            ptr = ptr->next;
+            //search for match;
+            buf[j] = '\0';
+            iterator* it = listGetIterator(&tokenList);
+            Token* token;
+            while ((token = listGetNext(it))) {
+                if (strcmp(buf, token->token) == 0) {
+                    fputc(token->code, ofile);
+                    j = -1;
+                }
+            }
+            if (j != -1) {
+                fprintf(ofile, "%s", buf);
+                strset(buf, '\0');
+            }
+            if (ch != EOF) {
+                fputc(ch, ofile);
+            }
+            break;
         }
     }
-    ptr = origSTART;
+    Token* tok;
+    while ((tok = listDeleteHead(&tokenList))) {
+        free(tok);
+    }
+}
 
-    while (origSTART->next != NULL) {
-        del(ptr);
+void assignCodes() {
+    list sortedByGain = initList;
+    listSetComparator(&sortedByGain, compareGainInverted);
+    Token* token;
+    while ((token = listDeleteHead(&tokenList))) {
+        listAppend(&sortedByGain, token);
     }
-    traverse();
+    iterator* it = listGetIterator(&sortedByGain);
+    int code;
+    for (code = 1; code < 256; code++) {
+        if (charmap[code] != 0) {
+            continue;
+        }
+        token = listGetNext(it);
+        if (!token) {
+            break;
+        }
+        token->code = code;
+    }
+    //delete any remaining tokens
+    while ((token = listDeleteNext(it))) {
+        free(token);
+    }
+    tokenList = sortedByGain;
+    free(it);
 }
 

@@ -15,8 +15,9 @@
  */
 int main(int argc, char** argv) {
     //xtrac_main(argc,argv);
-    TrieSquare_main(argc,argv);
+    //TrieSquare_main(argc,argv);
     //TokenSet_main(argc, argv);
+    dextr_main(argc, argv);
     return (EXIT_SUCCESS);
 }
 

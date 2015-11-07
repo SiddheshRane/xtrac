@@ -105,7 +105,7 @@ static int compareTrie(void* v1, void* v2) {
 
 list* sortTrie() {
     list *l = newList();
-    list_setComparator(l, compareTrie);
+    listSetComparator(l, compareTrie);
     int i;
     for (i = 0; i < 256; i++) {
         if (!trisqr.ascii[i]) {
@@ -118,14 +118,14 @@ list* sortTrie() {
             Key *k = calloc(1, sizeof (Key));
             k->i = i;
             k->j = j;
-            list_append(l, k);
+            listAppend(l, k);
         }
     }
     return l;
 }
 
 void printSortedTrie(list* l) {
-    if (!l || list_count(l) < 1) {
+    if (!l || listCount(l) < 1) {
         printf("List empty");
         return;
     }
