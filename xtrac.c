@@ -155,9 +155,8 @@ void parseFile(FILE *stream) {
     if (!stream) return;
 
     char buffer[64];
-    char ch;
     int i = 0; //index to check buffer overflow
-    ch = fgetc(stream);
+    int ch = fgetc(stream);
     while ((ch = fgetc(stream)) != EOF) {
         buffer[i] = ch;
         charmap[ch]++; //update character map
