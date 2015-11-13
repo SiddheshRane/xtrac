@@ -36,7 +36,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/Huffman.o \
-	${OBJECTDIR}/TokenSet.o \
 	${OBJECTDIR}/TrieSquare.o \
 	${OBJECTDIR}/dextr.o \
 	${OBJECTDIR}/list.o \
@@ -72,11 +71,6 @@ ${OBJECTDIR}/Huffman.o: Huffman.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Huffman.o Huffman.c
-
-${OBJECTDIR}/TokenSet.o: TokenSet.c 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TokenSet.o TokenSet.c
 
 ${OBJECTDIR}/TrieSquare.o: TrieSquare.c 
 	${MKDIR} -p ${OBJECTDIR}

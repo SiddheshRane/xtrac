@@ -27,6 +27,7 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" "Huffman.c"</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" "data1.txt"</runcommandpicklistitem>
         </runcommandpicklist>
         <runcommand>"${OUTPUT_PATH}" "data1.txt"</runcommand>

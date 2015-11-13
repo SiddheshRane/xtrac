@@ -14,7 +14,7 @@ extern "C" {
 
     void parseIntoTrySquare(FILE* input);
     void printTrieSquare();
-
+    list* getAllFeasibleCombinations(int i, int j);
 #ifdef	__cplusplus
 }
 #endif

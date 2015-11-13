@@ -21,13 +21,14 @@ typedef struct Token {
         struct Token * next; //for linked list
     } Token;
 
-    int del(Token *);
-    void fileParse();
+    
+
     void strset(char*, char);
     void parseFile(FILE*);
     void Xtrac();
     void assignCodes();
     void removeIncompressibleTokens();
+    int compareGainInverted(void*t1, void* t2);
 
 #ifdef	__cplusplus
 }

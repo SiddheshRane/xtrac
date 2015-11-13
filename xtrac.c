@@ -31,7 +31,7 @@ static int compareToken(void* t1, void* t2) {
     return strcmp(tt1->token, tt2->token);
 }
 
-static int compareGainInverted(void*t1, void* t2) {
+int compareGainInverted(void*t1, void* t2) {
     Token *tt1 = t1;
     Token *tt2 = t2;
     int a = tt1->gain;

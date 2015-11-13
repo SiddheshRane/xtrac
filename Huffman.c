@@ -41,11 +41,11 @@ HuffmanTree* buildHuffmanTree(int count[256]) {
             return NULL;
         p->ascii = i;
         p->freq = count[i];
-        printf("(freq:%d) ", p->freq);
+        //printf("(freq:%d) ", p->freq);
         listAppend(&l, p);
     }
 
-    listPrint(&l, printPrefix);
+   // listPrint(&l, printPrefix);
     printf("\n");
     Prefix *p1, *p2;
     while ((p1 = listDeleteHead(&l)) && (p2 = listDeleteHead(&l))) {

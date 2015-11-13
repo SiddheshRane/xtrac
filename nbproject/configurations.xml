@@ -72,10 +72,6 @@
       </item>
       <item path="SUMMARY.md" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="TokenSet.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="TokenSet.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="TrieSquare.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="TrieSquare.h" ex="false" tool="3" flavor2="0">
@@ -132,10 +128,6 @@
       <item path="README.md" ex="false" tool="3" flavor2="0">
       </item>
       <item path="SUMMARY.md" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="TokenSet.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="TokenSet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="TrieSquare.c" ex="false" tool="0" flavor2="0">
       </item>

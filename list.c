@@ -117,7 +117,6 @@ void listPrint(list *l, void (*print)(void*)) {
         return;
     }
     list_node* node = l->head;
-    printf("List contains %d elements:", l->count);
     while (node) {
         print(node->value);
         node = node->next;
