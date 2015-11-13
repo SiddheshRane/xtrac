@@ -3,8 +3,8 @@
 #include "list.h"
 
 const list initList = {0, 0, 0, 0, 0};
-static list_node* implGetNodeFrom(list_node* from, void* value);
-static void* implDeleteNode(list* l, list_node* node);
+static listNode* implGetNodeFrom(listNode* from, void* value);
+static void* implDeleteNode(list* l, listNode* node);
 
 list* newList() {
     list *l = calloc(1, sizeof (list));
@@ -15,9 +15,9 @@ void* listAppend(list* l, void *t) {
     if (!l || !t) {
         return NULL;
     }
-    list_node *insertAfter = NULL;
+    listNode *insertAfter = NULL;
     if (l->compare) {
-        list_node *node = l->head;
+        listNode *node = l->head;
         while (node) {
             if (l->compare(t, node->value) < 0) {
                 break;
@@ -30,7 +30,7 @@ void* listAppend(list* l, void *t) {
     } else {
         insertAfter = l->tail;
     }
-    list_node* newNode = malloc(sizeof (list_node));
+    listNode* newNode = malloc(sizeof (listNode));
     if (!newNode)
         return NULL;
     l->count++;
@@ -56,8 +56,8 @@ void* listAppend(list* l, void *t) {
     return t;
 }
 
-static list_node* implGetNodeFrom(list_node* from, void* value) {
-    list_node* node = from;
+static listNode* implGetNodeFrom(listNode* from, void* value) {
+    listNode* node = from;
     while (node) {
         if (node->value == value)
             return node;
@@ -66,7 +66,7 @@ static list_node* implGetNodeFrom(list_node* from, void* value) {
     return NULL;
 }
 
-static void* implDeleteNode(list* l, list_node* node) {
+static void* implDeleteNode(list* l, listNode* node) {
     if (!node)
         return NULL;
     void* value = node->value;
@@ -89,7 +89,7 @@ void* listDelete(list *l, void* value) {
     if (!l || !value) {
         return NULL;
     }
-    list_node* node = implGetNodeFrom(l->head, value);
+    listNode* node = implGetNodeFrom(l->head, value);
     return implDeleteNode(l, node);
 }
 
@@ -116,7 +116,7 @@ void listPrint(list *l, void (*print)(void*)) {
         printf("Empty!\n");
         return;
     }
-    list_node* node = l->head;
+    listNode* node = l->head;
     printf("List contains %d elements:", l->count);
     while (node) {
         print(node->value);
@@ -162,7 +162,7 @@ void* listDeleteNext(iterator* it) {
     if (!it || !it->current) {
         return NULL;
     }
-    list_node* toDelete = it->current;
+    listNode* toDelete = it->current;
     it->current = toDelete->next;
     it->remaining--;
     return implDeleteNode(it->l, it->current);

@@ -8,11 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "TokenSet.h"
-
-/*
- * 
- */
 int main(int argc, char** argv) {
     //xtrac_main(argc,argv);
     //TrieSquare_main(argc,argv);

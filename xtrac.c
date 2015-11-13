@@ -17,7 +17,9 @@ FILE *ifile;
 FILE *ofile;
 
 static list tokenList;
-
+/*
+ * A lexicographic comparator for string tokens inside Token
+ */
 static int compareToken(void* t1, void* t2) {
     Token *tt1 = t1;
     Token *tt2 = t2;
@@ -31,6 +33,9 @@ static int compareToken(void* t1, void* t2) {
     return strcmp(tt1->token, tt2->token);
 }
 
+/*
+ * An inverted comparator to get a descending sorted list. 
+ */
 static int compareGainInverted(void*t1, void* t2) {
     Token *tt1 = t1;
     Token *tt2 = t2;
@@ -125,13 +130,9 @@ int xtrac_main(int argc, char **argv) {
     }
 
     initGlobalTokenList();
-    printf("Parsing..\n");
     parseFile(ifile);
-    printf("remove unnecessary tokens\n");
     removeIncompressibleTokens();
-    printf("Charmap...\n");
     xmlCharmap();
-    printf("Xtrac...\n");
     Xtrac();
     fclose(ifile);
     fclose(ofile);
@@ -168,9 +169,9 @@ void parseFile(FILE *stream) {
             strset(buffer, '\0');
             if (appSTAT == 1)
                 return;
-        }//end if
+        }
         i++;
-    }//while
+    }
     buffer[i] = '\0';
     appendNewWord(buffer);
 }
@@ -180,7 +181,6 @@ The most important method. It creates the compressed
 file
  */
 void Xtrac() {
-    printf("assignCodes...\n");
     assignCodes();
     fputc(VERSION, ofile);
     if (listCount(&tokenList)) {
