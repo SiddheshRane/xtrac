@@ -5,6 +5,7 @@
 #include "xtrac.h"
 #include "list.h"
 #define VERSION 1
+#define BUFFER 32
 
 //character map
 int charmap[256];
@@ -62,7 +63,8 @@ int appendNewWord(char* word) {
     }
 
     temp->token = malloc(len);
-    if (!temp->token) {
+    if (!(temp->token)) {
+        free(temp);
         return 1;
     }
     strcpy(temp->token, word);
@@ -145,6 +147,8 @@ void removeIncompressibleTokens() {
     while ((token = listGetNext(it))) {
         if (token->gain < 1) {
             listDelete(&tokenList, token);
+            free(token->token);
+            free(token);
         }
     }
     free(it);
@@ -153,10 +157,9 @@ void removeIncompressibleTokens() {
 void parseFile(FILE *stream) {
     if (!stream) return;
 
-    char buffer[64];
-    char ch;
+    char buffer[BUFFER];
     int i = 0; //index to check buffer overflow
-    ch = fgetc(stream);
+    int ch = fgetc(stream);
     while ((ch = fgetc(stream)) != EOF) {
         buffer[i] = ch;
         charmap[ch]++; //update character map
@@ -165,11 +168,14 @@ void parseFile(FILE *stream) {
             buffer[i] = '\0';
             i = -1;
             int appSTAT = appendNewWord(buffer);
-            strset(buffer, '\0');
             if (appSTAT == 1)
                 return;
         }//end if
         i++;
+        if (i == BUFFER) {
+            printf("i == BUFFER\n");
+            i = 0;
+        }
     }//while
     buffer[i] = '\0';
     appendNewWord(buffer);
@@ -198,9 +204,8 @@ void Xtrac() {
     }
     //substitution
     fseek(ifile, 0, 0);
-    char buf[40];
+    char buf[BUFFER] = {0};
     int ch;
-    strset(buf, '\0');
     while ((ch = fgetc(ifile)) != EOF) {
         if (!isalnum(ch)) {
             fputc(ch, ofile);
@@ -213,7 +218,8 @@ void Xtrac() {
                 //Fill buf as long as you get alpha numeric
                 buf[j] = ch;
                 j++;
-                continue;
+                if (j < BUFFER - 1)
+                    continue;
             }
             //search for match;
             buf[j] = '\0';
