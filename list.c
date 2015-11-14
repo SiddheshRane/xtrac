@@ -134,7 +134,6 @@ void listPrint(list *l, void (*print)(void*)) {
         return;
     }
     listNode* node = l->head;
-    printf("List contains %d elements:", l->count);
     while (node) {
         print(node->value);
         node = node->next;
@@ -182,5 +181,5 @@ void* listDeleteNext(iterator* it) {
     listNode* toDelete = it->current;
     it->current = toDelete->next;
     it->remaining--;
-    return implDeleteNode(it->l, it->current);
+    return implDeleteNode(it->l, toDelete);
 }
