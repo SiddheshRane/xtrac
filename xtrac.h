@@ -4,7 +4,6 @@
  *
  * Created on 24 October, 2015, 9:24 PM
  */
-#include <stdio.h>
 #ifndef XTRAC_H
 #define	XTRAC_H
 
@@ -17,9 +16,8 @@ typedef struct Token {
         char * token;
         int size; //length of token obtained using strlen + 1
         int gain; //compressional gain (=(size-2)*count - (size+1))
-        char code; //the keycode for compression(0 means unassigned)
-        struct Token * next; //for linked list
-    } Token;
+        unsigned char code; //the keycode for compression(0 means unassigned)
+} Token;
 
     int del(Token *);
     void fileParse();

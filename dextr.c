@@ -20,12 +20,12 @@
 #include <stdlib.h>
 #define OP 0
 #define VERSION 1
+#define VERBOSE 1
 
 static char* map[256];
-
 static int tokenCount = 0;
 
-int dextr(FILE* input, FILE* output);
+int dextr_main(FILE* input, FILE* output, unsigned flag);
 void printMap();
 
 long filesize;
@@ -47,7 +47,6 @@ static void load_map(FILE* input) {
         getdelim(&value, &len, OP, input);
         map[key] = value;
     }
-
 }
 
 void decompress(FILE* input, FILE* output) {
@@ -63,7 +62,7 @@ void decompress(FILE* input, FILE* output) {
     }
 }
 
-int dextr(FILE* input, FILE* output) {
+int dextr_main(FILE* input, FILE* output, unsigned flag) {
     if (!input || !output) {
         return 1;
     }
@@ -72,8 +71,12 @@ int dextr(FILE* input, FILE* output) {
     if (buf != VERSION)
         return 2;
     load_map(input);
-    printMap();
+    if (flag & VERBOSE) {
+        printMap();
+    }
     decompress(input, output);
+    fclose(input);
+    fclose(output);
 }
 
 void printMap() {
@@ -85,17 +88,4 @@ void printMap() {
         }
     }
 
-}
-///////////////MAIN//////////////////////
-
-int dextr_main(FILE *input, FILE *output) {
-    int code = dextr(input, output);
-    switch (code) {
-        case 1:
-        case 2:
-        case 3:
-            printf("Dextr error code %d. Press any key to exit", code);
-    }
-    fclose(input);
-    fclose(output);
 }

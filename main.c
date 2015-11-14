@@ -22,11 +22,16 @@
 #define COMPRESS 0
 #define UNCOMPRESS 1
 
-/*The input and output files*/
+int xtrac_main(FILE* input, FILE* output, unsigned flag);
+int dextr_main(FILE* input, FILE* output, unsigned flag);
 
-
-void printHelp() {
-    printf("Usage:\nxtrac <inputfile> <outputfile>");
+void printHelp(char *argv0) {
+    printf("USAGE:\n%s <inputfile> [-v] [-x] [ -o <outputfile>]\n"
+            "\n         SUMMARY OF OPTIONS\n"
+            "-v --verbose : Verbose mode. Prints out the relevant data used for (de)compression to standard output\n"
+            "-x           : Decompress the input file. The default option is compression.\n"
+            "-o <file>    : Place the output in the specified file. The file will be newly created if it does not exist.\n"
+            "-h --help    : Print this help message\n", argv0);
 }
 
 char* stripExtensionName(char *input, char *ext) {
@@ -56,12 +61,13 @@ char* appendExtensionName(char *input, char *ext) {
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        printHelp();
+        printHelp(argv[0]);
         return 1;
     }
     FILE *ifile = NULL, *ofile = NULL;
     char *input = NULL, *output = NULL;
     int operation = COMPRESS;
+    unsigned flag = 0;
 
     int i;
     for (i = 1; i < argc; i++) {
@@ -70,6 +76,11 @@ int main(int argc, char** argv) {
             i++;
         } else if (strcmp(argv[i], "-x") == 0) {
             operation = UNCOMPRESS;
+        } else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--verbose") == 0) {
+            flag = 1;
+        } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+            printHelp(argv[0]);
+            return 0;
         } else {
             input = argv[i];
         }
@@ -82,8 +93,7 @@ int main(int argc, char** argv) {
         if (operation == COMPRESS) {
             output = appendExtensionName(input, "xtr");
         } else {
-            output = stripExtensionName(input, ".xtr"); //xtrac.c.xtr
-            printf("output : %s\n", output);
+            output = stripExtensionName(input, ".xtr");
         }
     }
     if (strcmp(input, output) == 0) {
@@ -102,9 +112,9 @@ int main(int argc, char** argv) {
         return 1;
     }
     switch (operation) {
-        case COMPRESS: xtrac_main(ifile, ofile);
+        case COMPRESS: xtrac_main(ifile, ofile, flag);
             break;
-        case UNCOMPRESS: dextr(ifile, ofile);
+        case UNCOMPRESS: dextr_main(ifile, ofile, flag);
             break;
     }
     return 0;
