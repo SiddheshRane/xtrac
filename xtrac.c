@@ -1,3 +1,20 @@
+/* 
+ * Copyright (C) 2015 Siddhesh
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -17,6 +34,7 @@ FILE *ifile;
 FILE *ofile;
 
 static list tokenList;
+
 /*
  * A lexicographic comparator for string tokens inside Token
  */
@@ -107,32 +125,18 @@ void strset(char *s, char c) {
     }
 }
 
-void printHelp() {
-    printf("Usage:\nxtrac <inputfile> <outputfile>");
-}
+
 
 //-----------MAIN--------------
 
-int xtrac_main(int argc, char **argv) {
-    if (argc < 2) {
-        printHelp();
-        return 1;
-    }
-    ifile = fopen(argv[1], "r");
-    if (!ifile) {
-        printf("Could not open file %s", argv[1]);
-        return 1;
-    }
-    ofile = fopen("XTR.xtr", "w");
-    if (!ofile) {
-        printf("Could not create output file");
-        return 1;
-    }
-
+int xtrac_main(FILE *input, FILE *output) {
+    ifile = input;
+    ofile = output;
     initGlobalTokenList();
     parseFile(ifile);
     removeIncompressibleTokens();
     xmlCharmap();
+    assignCodes();
     Xtrac();
     fclose(ifile);
     fclose(ofile);
@@ -176,11 +180,9 @@ void parseFile(FILE *stream) {
 }
 
 /*
-The most important method. It creates the compressed
-file
+ * The most important method. It creates the compressed file
  */
 void Xtrac() {
-    assignCodes();
     fputc(VERSION, ofile);
     if (listCount(&tokenList)) {
         /*Insert meta data if there is any*/
@@ -239,7 +241,10 @@ void Xtrac() {
         free(tok);
     }
 }
-
+static void printToken(void *t1) {
+    Token *t = t1;
+    printf("%d: (%d bytes) %s\n", t->code, t->gain, t->token);
+}
 void assignCodes() {
     list sortedByGain = initList;
     listSetComparator(&sortedByGain, compareGainInverted);
@@ -265,5 +270,8 @@ void assignCodes() {
     }
     tokenList = sortedByGain;
     free(it);
+    /*Debug*/
+    printf("Printing Sorted Token List\n");
+    listPrint(&sortedByGain,printToken);
 }
 

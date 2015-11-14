@@ -1,3 +1,20 @@
+/* 
+ * Copyright (C) 2015 Siddhesh
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include<string.h>
 #include<stdio.h>
 #include <stdlib.h>
@@ -20,7 +37,7 @@ static void load_map(FILE* input) {
     if (fgetc(input)) {
         //if not zero, no map is defined in input file
         fseek(input, -1, SEEK_CUR);
-        return ;
+        return;
     }
 
     int key;
@@ -63,7 +80,7 @@ void printMap() {
     printf("Printing Map\n");
     int i;
     for (i = 0; i < 256; i++) {
-        if(map[i]){
+        if (map[i]) {
             printf("%3d:%s\n", i, map[i]);
         }
     }
@@ -71,37 +88,8 @@ void printMap() {
 }
 ///////////////MAIN//////////////////////
 
-int dextr_main(int argc, char** argv) {
-    if (argc < 2) {
-        printf("Usage:\n dextr <inputfile> [<outputfile>]\n");
-        return 1;
-    }
-
-    FILE* input = fopen(argv[1], "r");
-    if (!input) {
-        perror("Could not open input file");
-        return 1;
-    }
-    
-    FILE* output;
-    if(argc > 2) {
-        output = fopen(argv[2], "w");
-    }
-    else {
-        int len = strlen(argv[1]);
-        char* filename = malloc(len+4);
-        strcpy(filename, argv[1]);
-        filename[len] = 'T';
-        filename[len+1] = 'X';
-        filename[len+2] = 'T';
-        output = fopen(filename, "w");
-    }
-    if (!output) {
-        perror("Could not open output file");
-        return 1;
-    }
+int dextr_main(FILE *input, FILE *output) {
     int code = dextr(input, output);
-
     switch (code) {
         case 1:
         case 2:
