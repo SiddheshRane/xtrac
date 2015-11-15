@@ -97,7 +97,8 @@ int main(int argc, char** argv) {
         }
     }
     if (strcmp(input, output) == 0) {
-        printf("Output file name cannot be the same as input file\n");
+        printf("Output file name cannot be the same as input file\n"
+        "Try specifying an explicit output file with -o <filename>\n");
         return 1;
     }
     ifile = fopen(input, "r");
