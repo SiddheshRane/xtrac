@@ -21,7 +21,6 @@ typedef struct Token {
 
     int del(Token *);
     void fileParse();
-    void strset(char*, char);
     void parseFile(FILE*);
     void Xtrac();
     void assignCodes();

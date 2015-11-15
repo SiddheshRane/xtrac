@@ -23,7 +23,7 @@
 #include "list.h"
 #define VERSION 1
 #define VERBOSE 1
-#define BUFFER 32
+#define BUFFER 128
 
 //character map
 int charmap[256];
@@ -118,12 +118,6 @@ void xmlCharmap() {
     }
 }
 
-void strset(char *s, char c) {
-    if (!s) return;
-    while (*s) {
-        *s++ = c;
-    }
-}
 
 /*
  *-----------MAIN--------------
@@ -136,13 +130,15 @@ int xtrac_main(FILE *input, FILE *output, unsigned _flag) {
     initGlobalTokenList();
     parseFile(ifile);
     removeIncompressibleTokens();
-    xmlCharmap();
+    if (flag & VERBOSE) {
+        xmlCharmap();
+    }
     assignCodes();
     Xtrac();
     fclose(ifile);
     fclose(ofile);
 }
-
+/*Removes words that don't occur frequently enough for compression*/
 void removeIncompressibleTokens() {
     iterator* it = listGetIterator(&tokenList);
     Token* token;
@@ -156,12 +152,13 @@ void removeIncompressibleTokens() {
     free(it);
 }
 
+/*Tokenizes the input file with words delimited by punctuation*/
 void parseFile(FILE *stream) {
     if (!stream) return;
 
     char buffer[BUFFER];
     int i = 0; //index to check buffer overflow
-    int ch = fgetc(stream);
+    int ch;
     while ((ch = fgetc(stream)) != EOF) {
         buffer[i] = ch;
         charmap[ch]++; //update character map
@@ -180,6 +177,18 @@ void parseFile(FILE *stream) {
     }//while
     buffer[i] = '\0';
     appendNewWord(buffer);
+}
+
+Token* findMatch(char *word) {
+    iterator* it = listGetIterator(&tokenList);
+    Token *match;
+    while ((match = listGetNext(it))) {
+        if (strcmp(match->token, word) == 0) {
+            return match;
+        }
+    }
+    free(it);
+    return NULL;
 }
 
 /*
@@ -202,45 +211,46 @@ void Xtrac() {
     }
     //substitution
     fseek(ifile, 0, 0);
-    char buf[BUFFER] = {0};
+    char buffer[BUFFER] = {0};
+    int i = 0; //index to check buffer overflow
     int ch;
     while ((ch = fgetc(ifile)) != EOF) {
+        buffer[i] = ch;
         if (!isalnum(ch)) {
-            fputc(ch, ofile);
-            continue;
-        }
-        buf[0] = ch;
-        int j = 1;
-        while (1) {
-            ch = fgetc(ifile);
-            if (isalnum(ch)) {
-                //Fill buf as long as you get alpha numeric
-                buf[j] = ch;
-                j++;
-                if (j < BUFFER - 1)
-                    continue;
+            if (i == 0) {
+                fputc(ch, ofile);
+                continue;
+            } else if (i == 1) {
+                /*one character can never be compressed*/
+                fputc(buffer[0], ofile);
+                fputc(ch, ofile);
+                i = 0;
+                continue;
             }
-            //search for match;
-            buf[j] = '\0';
-            iterator* it = listGetIterator(&tokenList);
-            Token* token;
-            while ((token = listGetNext(it))) {
-                if (strcmp(buf, token->token) == 0) {
-                    fputc(token->code, ofile);
-                    j = -1;
-                }
-            }
-            if (j != -1) {
-                fwrite(buf, 1, j, ofile);
-                strset(buf, '\0');
-            }
-            if (ch != EOF) {
+            buffer[i] = '\0';
+            Token *tok = findMatch(buffer);
+            if (tok) {
+                fputc(tok->code, ofile);
+                fputc(ch, ofile);
+            } else {
+                fwrite(buffer, 1, i, ofile);
                 fputc(ch, ofile);
             }
-            break;
+            i = 0;
+            continue;
         }
+        i++;
+        if (i == BUFFER) {
+            fwrite(buffer, 1, BUFFER, ofile);
+            i = 0;
+        }
+    }//while
+    buffer[i] = '\0';
+    Token* tok = findMatch(buffer);
+    if (tok) {
+        fputc(tok->code, ofile);
     }
-    Token* tok;
+
     while ((tok = listDeleteHead(&tokenList))) {
         free(tok->token);
         free(tok);
@@ -251,7 +261,7 @@ static void printToken(void *t1) {
     Token *t = t1;
     printf("%d: (%d bytes) %s\n", t->code, t->gain, t->token);
 }
-
+/*Assigns unused ascii codes to most repeating words*/
 void assignCodes() {
     list sortedByGain = initList;
     listSetComparator(&sortedByGain, compareGainInverted);
